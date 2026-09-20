@@ -1,0 +1,151 @@
+{
+  "manifest_version": 1,
+  "type": "device",
+  "name": "Xiaomi Home",
+  "description": {
+    "en": "Control your Xiaomi, Mijia and Aqara devices through the Xiaomi Home cloud.",
+    "fr": "Pilotez vos appareils Xiaomi, Mijia et Aqara via le cloud Xiaomi Home."
+  },
+  "version": "1.0.10",
+  "docker_image": "ghcr.io/syntax-error-1337/gladys-xiaomi-home:1.0.10",
+  "gladys_version": ">=4.86.0",
+  "cover_image": "https://raw.githubusercontent.com/Syntax-Error-1337/gladys-xiaomi-home/main/cover.jpg",
+  "categories": ["lighting", "climate", "security"],
+  "transports": ["cloud"],
+  "config_schema": [
+    {
+      "key": "intro",
+      "type": "section",
+      "label": { "en": "Connect your Xiaomi account", "fr": "Connectez votre compte Xiaomi" },
+      "description": {
+        "en": "Pick the region of your Xiaomi Home account, then click Connect: a QR code opens. Scan it with your phone (Xiaomi Home app, or the Xiaomi Account section of a Xiaomi phone) and approve the sign-in. The QR page stays still by design: watch the connection indicator on THIS screen, it turns green on its own within seconds. If you cannot scan, use the \"Get a manual sign-in link\" action.",
+        "fr": "Choisissez la région de votre compte Xiaomi Home, puis cliquez sur Connecter : un QR code s'ouvre. Scannez-le avec votre téléphone (application Xiaomi Home, ou la section Compte Xiaomi d'un téléphone Xiaomi) et validez la connexion. La page du QR code ne bouge pas, c'est normal : surveillez l'indicateur de connexion sur CET écran, il passe au vert tout seul en quelques secondes. Si vous ne pouvez pas scanner, utilisez l'action « Obtenir un lien de connexion manuel »."
+      },
+      "links": [
+        {
+          "url": "https://github.com/Syntax-Error-1337/gladys-xiaomi-home/blob/main/docs/en.md",
+          "label": { "en": "Step-by-step guide", "fr": "Guide pas à pas" }
+        }
+      ]
+    },
+    {
+      "key": "cloud_server",
+      "type": "select",
+      "label": { "en": "Xiaomi region", "fr": "Région Xiaomi" },
+      "description": {
+        "en": "The region your Xiaomi Home account belongs to. Account data is isolated per region: the wrong region shows no device.",
+        "fr": "La région de votre compte Xiaomi Home. Les données sont cloisonnées par région : une mauvaise région n'affiche aucun appareil."
+      },
+      "required": true,
+      "default": "cn",
+      "options": [
+        { "value": "cn", "label": { "en": "China", "fr": "Chine" } },
+        { "value": "de", "label": { "en": "Europe", "fr": "Europe" } },
+        { "value": "i2", "label": { "en": "India", "fr": "Inde" } },
+        { "value": "ru", "label": { "en": "Russia", "fr": "Russie" } },
+        { "value": "sg", "label": { "en": "Singapore", "fr": "Singapour" } },
+        { "value": "us", "label": { "en": "United States", "fr": "États-Unis" } }
+      ]
+    },
+    {
+      "key": "xiaomi_account",
+      "type": "account_link",
+      "label": { "en": "Xiaomi account", "fr": "Compte Xiaomi" },
+      "description": {
+        "en": "Opens a QR code to scan with your phone. The connection indicator of this screen turns green by itself once you approve.",
+        "fr": "Ouvre un QR code à scanner avec votre téléphone. L'indicateur de connexion de cet écran passe au vert tout seul dès que vous validez."
+      }
+    },
+    {
+      "key": "poll_frequency",
+      "type": "select",
+      "label": { "en": "Refresh interval", "fr": "Intervalle de rafraîchissement" },
+      "description": {
+        "en": "How often each device is read from the cloud. Changes normally arrive instantly through the Xiaomi push channel; polling is the safety net.",
+        "fr": "Fréquence de lecture de chaque appareil dans le cloud. Les changements arrivent normalement instantanément via le canal push Xiaomi ; l'interrogation est le filet de sécurité."
+      },
+      "required": false,
+      "default": "60",
+      "options": [
+        { "value": "1", "label": { "en": "Every second", "fr": "Toutes les secondes" } },
+        { "value": "2", "label": { "en": "Every 2 seconds", "fr": "Toutes les 2 secondes" } },
+        { "value": "10", "label": { "en": "Every 10 seconds", "fr": "Toutes les 10 secondes" } },
+        { "value": "15", "label": { "en": "Every 15 seconds", "fr": "Toutes les 15 secondes" } },
+        { "value": "30", "label": { "en": "Every 30 seconds", "fr": "Toutes les 30 secondes" } },
+        { "value": "60", "label": { "en": "Every minute", "fr": "Toutes les minutes" } }
+      ]
+    },
+    {
+      "key": "expose_actions",
+      "type": "boolean",
+      "label": { "en": "Expose device actions", "fr": "Exposer les actions des appareils" },
+      "description": {
+        "en": "Expose the argument-less MIoT actions (start cleaning, reset filter...) as command switches.",
+        "fr": "Expose les actions MIoT sans argument (démarrer le nettoyage, réinitialiser le filtre...) sous forme d'interrupteurs de commande."
+      },
+      "required": false,
+      "default": true
+    },
+    {
+      "key": "expose_unmapped",
+      "type": "boolean",
+      "label": { "en": "Expose every property", "fr": "Exposer toutes les propriétés" },
+      "description": {
+        "en": "Also create a feature for the vendor properties Gladys has no category for. Useful for debugging, noisy on most devices.",
+        "fr": "Crée aussi une fonctionnalité pour les propriétés propriétaires sans catégorie Gladys. Utile pour le diagnostic, bruyant sur la plupart des appareils."
+      },
+      "required": false,
+      "default": false
+    }
+  ],
+  "actions": [
+    {
+      "key": "manual_login",
+      "label": { "en": "Get a manual sign-in link", "fr": "Obtenir un lien de connexion manuel" },
+      "description": {
+        "en": "Fallback when you cannot scan the QR code: returns the Xiaomi sign-in URL to open in a browser.",
+        "fr": "Solution de repli si vous ne pouvez pas scanner le QR code : renvoie l'URL de connexion Xiaomi à ouvrir dans un navigateur."
+      },
+      "timeout_seconds": 30
+    },
+    {
+      "key": "login",
+      "label": { "en": "Finish the login", "fr": "Terminer la connexion" },
+      "description": {
+        "en": "Only needed after the manual sign-in link: paste the address Xiaomi sent you to (or just the code it contains).",
+        "fr": "Uniquement après le lien de connexion manuel : collez l'adresse vers laquelle Xiaomi vous a envoyé (ou uniquement le code qu'elle contient)."
+      },
+      "timeout_seconds": 120,
+      "fields": [
+        {
+          "key": "code",
+          "type": "string",
+          "label": { "en": "Redirected address or code", "fr": "Adresse de redirection ou code" },
+          "placeholder": {
+            "en": "http://homeassistant.local:8123/api/webhook/...?code=...",
+            "fr": "http://homeassistant.local:8123/api/webhook/...?code=..."
+          },
+          "required": true
+        }
+      ]
+    },
+    {
+      "key": "refresh_devices",
+      "label": { "en": "Refresh the device list", "fr": "Rafraîchir la liste des appareils" },
+      "description": {
+        "en": "Re-read the devices of your Xiaomi account and their specifications.",
+        "fr": "Relit les appareils de votre compte Xiaomi et leurs spécifications."
+      },
+      "timeout_seconds": 120
+    },
+    {
+      "key": "sign_out",
+      "label": { "en": "Disconnect the account", "fr": "Déconnecter le compte" },
+      "description": {
+        "en": "Forget the Xiaomi tokens stored by the integration.",
+        "fr": "Oublie les jetons Xiaomi stockés par l'intégration."
+      },
+      "timeout_seconds": 30
+    }
+  ]
+}
